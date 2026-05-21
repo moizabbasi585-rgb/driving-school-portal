@@ -1,586 +1,338 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Car,
-  ClipboardList,
-  Save,
-  User,
-  Users,
-  ChevronRight,
-  CheckCircle2,
-  Circle,
-  BookOpen,
-  Target,
-  AlertCircle,
-} from "lucide-react";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-type SkillLevel = 1 | 2 | 3 | 4 | 5;
-
+// ─── TYPES ───────────────────────────────────────────────────────────────────
 interface Skill {
   id: string;
   name: string;
-  level: SkillLevel;
+  description: string;
+  score: number; // 1 to 5
 }
 
-interface PupilData {
+interface StudentData {
   name: string;
-  skills: Skill[];
+  carType: string;
+  location: string;
   lessonNotes: string;
   nextGoals: string;
-  lastUpdated: string;
+  skills: Skill[];
 }
 
-type Role = "instructor" | "pupil";
+// ─── INITIAL MOCK DATA ────────────────────────────────────────────────────────
+const initialSkills: Skill[] = [
+  { id: "junctions", name: "Junctions & Emerging", description: "Approaching, turning left/right, and safety checks.", score: 2 },
+  { id: "roundabouts", name: "Roundabouts", description: "Lane discipline, signaling, and matching traffic flow.", score: 1 },
+  { id: "parking", name: "Parallel Parking", description: "Reversing accurately into a space behind another vehicle.", score: 3 },
+  { id: "emergency", name: "Emergency Stop", description: "Quick control, prompt stopping, and securing the vehicle.", score: 1 },
+];
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const STORAGE_KEY = "pupil_progress_log_v1";
-
-const LEVEL_META: Record<
-  SkillLevel,
-  { label: string; color: string; bg: string; ring: string }
-> = {
-  1: {
-    label: "Introduced",
-    color: "text-slate-600",
-    bg: "bg-slate-100",
-    ring: "ring-slate-300",
-  },
-  2: {
-    label: "Helped",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    ring: "ring-blue-300",
-  },
-  3: {
-    label: "Prompted",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    ring: "ring-amber-300",
-  },
-  4: {
-    label: "Independent",
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    ring: "ring-emerald-300",
-  },
-  5: {
-    label: "Test Ready",
-    color: "text-violet-600",
-    bg: "bg-violet-50",
-    ring: "ring-violet-400",
-  },
-};
-
-const DEFAULT_DATA: PupilData = {
+const defaultStudent: StudentData = {
   name: "Alex Jones",
-  skills: [
-    { id: "junctions", name: "Junctions & Emerging", level: 2 },
-    { id: "roundabouts", name: "Roundabouts", level: 1 },
-    { id: "parallel", name: "Parallel Parking", level: 3 },
-    { id: "emergency", name: "Emergency Stop", level: 4 },
-  ],
-  lessonNotes:
-    "Alex showed great improvement on parallel parking today. Mirror checks are consistent. Needs more confidence at busy junctions.",
-  nextGoals:
-    "Practice emerging at T-junctions in the town centre. Revisit roundabout lane discipline.",
-  lastUpdated: new Date().toISOString(),
+  carType: "Automatic",
+  location: "Liverpool",
+  lessonNotes: "Great clutch control progression today. Practiced smooth downshifts when approaching junctions. Need to check mirrors more consistently before signaling.",
+  nextGoals: "Master spiral roundabouts and begin introducing reversing maneuvers.",
+  skills: initialSkills,
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── PURE SVG ICONS (Replaces lucide-react entirely) ─────────────────────────
+const CarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 21h14"/></svg>
+);
+const UserIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+);
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+);
+const ClipboardIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+);
+const SaveIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+);
+const TargetIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+);
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+);
 
-function calcCompletion(skills: Skill[]): number {
-  const max = skills.length * 5;
-  const total = skills.reduce((sum, s) => sum + s.level, 0);
-  return Math.round((total / max) * 100);
-}
+const competencyLabels: { [key: number]: string } = {
+  1: "Introduced",
+  2: "Helped",
+  3: "Prompted",
+  4: "Independent",
+  5: "Test Ready",
+};
 
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
+export default function PupilProgressPortal() {
+  const [viewMode, setViewMode] = useState<"instructor" | "pupil">("instructor");
+  const [studentData, setStudentData] = useState<StudentData | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function ProgressRing({
-  pct,
-  size = 160,
-}: {
-  pct: number;
-  size?: number;
-}) {
-  const r = (size - 20) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
-  const color =
-    pct >= 80
-      ? "#7c3aed"
-      : pct >= 50
-      ? "#059669"
-      : pct >= 25
-      ? "#d97706"
-      : "#64748b";
-
-  return (
-    <svg width={size} height={size} className="drop-shadow-md">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke="#e2e8f0"
-        strokeWidth={12}
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={color}
-        strokeWidth={12}
-        strokeLinecap="round"
-        strokeDasharray={circ}
-        strokeDashoffset={offset}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        style={{ transition: "stroke-dashoffset 0.6s ease" }}
-      />
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize={size * 0.2}
-        fontWeight="700"
-        fill={color}
-      >
-        {pct}%
-      </text>
-      <text
-        x="50%"
-        y="65%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize={size * 0.09}
-        fill="#94a3b8"
-      >
-        complete
-      </text>
-    </svg>
-  );
-}
-
-function LevelBadge({ level }: { level: SkillLevel }) {
-  const m = LEVEL_META[level];
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ring-1 ${m.bg} ${m.color} ${m.ring}`}
-    >
-      {level === 5 ? (
-        <CheckCircle2 size={12} />
-      ) : (
-        <Circle size={12} />
-      )}
-      {level} — {m.label}
-    </span>
-  );
-}
-
-// ─── Instructor View ──────────────────────────────────────────────────────────
-
-function InstructorView({
-  data,
-  onSave,
-}: {
-  data: PupilData;
-  onSave: (d: PupilData) => void;
-}) {
-  const [draft, setDraft] = useState<PupilData>(() =>
-    JSON.parse(JSON.stringify(data))
-  );
-  const [saved, setSaved] = useState(false);
-
+  // Load from local storage on mount
   useEffect(() => {
-    setDraft(JSON.parse(JSON.stringify(data)));
-  }, [data]);
-
-  const setLevel = (id: string, level: SkillLevel) => {
-    setDraft((prev) => ({
-      ...prev,
-      skills: prev.skills.map((s) => (s.id === id ? { ...s, level } : s)),
-    }));
-    setSaved(false);
-  };
-
-  const handleSave = () => {
-    const updated = { ...draft, lastUpdated: new Date().toISOString() };
-    onSave(updated);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
-  };
-
-  const completion = calcCompletion(draft.skills);
-
-  return (
-    <div className="space-y-6">
-      {/* Header card */}
-      <div className="rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-700 p-5 text-white shadow-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-violet-200 text-sm font-medium">Current Pupil</p>
-            <h2 className="text-2xl font-bold mt-0.5">{draft.name}</h2>
-          </div>
-          <div className="text-right">
-            <p className="text-violet-200 text-xs">Syllabus Completion</p>
-            <p className="text-4xl font-black">{completion}%</p>
-          </div>
-        </div>
-        <div className="mt-4 h-2 rounded-full bg-white/20">
-          <div
-            className="h-2 rounded-full bg-white transition-all duration-500"
-            style={{ width: `${completion}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Skill scoring */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-          <ClipboardList size={18} className="text-violet-600" />
-          <h3 className="font-semibold text-slate-800">DVSA Skill Scores</h3>
-        </div>
-        <div className="divide-y divide-slate-50">
-          {draft.skills.map((skill) => (
-            <div key={skill.id} className="px-5 py-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-slate-700">
-                  {skill.name}
-                </span>
-                <LevelBadge level={skill.level} />
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {([1, 2, 3, 4, 5] as SkillLevel[]).map((lvl) => {
-                  const m = LEVEL_META[lvl];
-                  const active = skill.level === lvl;
-                  return (
-                    <button
-                      key={lvl}
-                      onClick={() => setLevel(skill.id, lvl)}
-                      className={`flex-1 min-w-[52px] rounded-xl py-2 text-xs font-semibold ring-1 transition-all duration-150 ${
-                        active
-                          ? `${m.bg} ${m.color} ${m.ring} scale-105 shadow-sm`
-                          : "bg-slate-50 text-slate-400 ring-slate-200 hover:bg-slate-100"
-                      }`}
-                    >
-                      {lvl}
-                      <span className="block text-[10px] font-normal leading-tight mt-0.5 truncate px-1">
-                        {m.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Notes */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-          <BookOpen size={18} className="text-violet-600" />
-          <h3 className="font-semibold text-slate-800">Lesson Notes</h3>
-        </div>
-        <div className="px-5 py-4">
-          <textarea
-            rows={4}
-            value={draft.lessonNotes}
-            onChange={(e) =>
-              setDraft((p) => ({ ...p, lessonNotes: e.target.value }))
-            }
-            placeholder="Add notes from today's lesson…"
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none"
-          />
-        </div>
-      </div>
-
-      {/* Goals */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-          <Target size={18} className="text-violet-600" />
-          <h3 className="font-semibold text-slate-800">Next Lesson Goals</h3>
-        </div>
-        <div className="px-5 py-4">
-          <textarea
-            rows={3}
-            value={draft.nextGoals}
-            onChange={(e) =>
-              setDraft((p) => ({ ...p, nextGoals: e.target.value }))
-            }
-            placeholder="What should the pupil focus on next time…"
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none"
-          />
-        </div>
-      </div>
-
-      {/* Save button */}
-      <button
-        onClick={handleSave}
-        className={`w-full flex items-center justify-center gap-2 rounded-2xl py-4 text-sm font-semibold shadow-md transition-all duration-300 ${
-          saved
-            ? "bg-emerald-500 text-white"
-            : "bg-violet-600 hover:bg-violet-700 text-white"
-        }`}
-      >
-        {saved ? (
-          <>
-            <CheckCircle2 size={18} />
-            Saved & Synced!
-          </>
-        ) : (
-          <>
-            <Save size={18} />
-            Save &amp; Sync
-          </>
-        )}
-      </button>
-    </div>
-  );
-}
-
-// ─── Pupil / Parent View ──────────────────────────────────────────────────────
-
-function PupilView({ data }: { data: PupilData }) {
-  const completion = calcCompletion(data.skills);
-  const label =
-    completion === 100
-      ? "Test Ready! 🎉"
-      : completion >= 75
-      ? "Great Progress"
-      : completion >= 40
-      ? "Building Skills"
-      : "Getting Started";
-
-  return (
-    <div className="space-y-6">
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 border border-violet-100 p-6 flex flex-col items-center text-center shadow-sm">
-        <div className="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
-          <User size={24} className="text-violet-600" />
-        </div>
-        <p className="text-slate-500 text-sm">Progress Report for</p>
-        <h2 className="text-2xl font-black text-slate-800 mt-0.5">
-          {data.name}
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Last updated: {fmtDate(data.lastUpdated)}
-        </p>
-        <div className="mt-5">
-          <ProgressRing pct={completion} size={160} />
-        </div>
-        <span className="mt-3 text-sm font-semibold text-violet-700 bg-violet-100 px-4 py-1.5 rounded-full">
-          {label}
-        </span>
-      </div>
-
-      {/* Skill badges */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-          <ClipboardList size={18} className="text-violet-600" />
-          <h3 className="font-semibold text-slate-800">Skill Breakdown</h3>
-        </div>
-        <div className="divide-y divide-slate-50">
-          {data.skills.map((skill) => {
-            const m = LEVEL_META[skill.level];
-            const barPct = (skill.level / 5) * 100;
-            return (
-              <div key={skill.id} className="px-5 py-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-700">
-                    {skill.name}
-                  </span>
-                  <LevelBadge level={skill.level} />
-                </div>
-                <div className="h-1.5 rounded-full bg-slate-100">
-                  <div
-                    className={`h-1.5 rounded-full transition-all duration-700 ${
-                      skill.level === 5
-                        ? "bg-violet-500"
-                        : skill.level === 4
-                        ? "bg-emerald-500"
-                        : skill.level === 3
-                        ? "bg-amber-400"
-                        : skill.level === 2
-                        ? "bg-blue-400"
-                        : "bg-slate-400"
-                    }`}
-                    style={{ width: `${barPct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Notes from instructor */}
-      {data.lessonNotes && (
-        <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-            <BookOpen size={18} className="text-violet-600" />
-            <h3 className="font-semibold text-slate-800">
-              Instructor&apos;s Notes
-            </h3>
-          </div>
-          <div className="px-5 py-4">
-            <p className="text-sm text-slate-600 leading-relaxed">
-              {data.lessonNotes}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Next goals */}
-      {data.nextGoals && (
-        <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 overflow-hidden">
-          <div className="px-5 py-4 border-b border-emerald-100 flex items-center gap-2">
-            <Target size={18} className="text-emerald-600" />
-            <h3 className="font-semibold text-emerald-800">
-              Focus for Next Lesson
-            </h3>
-          </div>
-          <div className="px-5 py-4 flex gap-3">
-            <AlertCircle
-              size={18}
-              className="text-emerald-500 mt-0.5 shrink-0"
-            />
-            <p className="text-sm text-emerald-800 leading-relaxed">
-              {data.nextGoals}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Scale legend */}
-      <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-800 text-sm">
-            DVSA Progress Scale
-          </h3>
-        </div>
-        <div className="px-5 py-4 grid grid-cols-1 gap-2">
-          {([1, 2, 3, 4, 5] as SkillLevel[]).map((lvl) => {
-            const m = LEVEL_META[lvl];
-            return (
-              <div key={lvl} className="flex items-center gap-3">
-                <span
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${m.bg} ${m.color}`}
-                >
-                  {lvl}
-                </span>
-                <span className={`text-sm font-medium ${m.color}`}>
-                  {m.label}
-                </span>
-                <ChevronRight size={12} className="text-slate-300 ml-auto" />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Root Page ────────────────────────────────────────────────────────────────
-
-export default function Page() {
-  const [role, setRole] = useState<Role>("instructor");
-  const [data, setData] = useState<PupilData | null>(null);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setData(JSON.parse(raw) as PupilData);
-      } else {
-        setData(DEFAULT_DATA);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+    const savedData = localStorage.getItem("driving_portal_data");
+    if (savedData) {
+      try {
+        setStudentData(JSON.parse(savedData));
+      } catch (e) {
+        setStudentData(defaultStudent);
       }
-    } catch {
-      setData(DEFAULT_DATA);
+    } else {
+      setStudentData(defaultStudent);
     }
   }, []);
 
-  // Persist to localStorage whenever data changes
-  const handleSave = (updated: PupilData) => {
-    setData(updated);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {
-      console.error("localStorage write failed");
-    }
-  };
-
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-violet-300 border-t-violet-600 animate-spin" />
-      </div>
-    );
+  if (!studentData) {
+    return <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading portal...</div>;
   }
 
+  // Calculate dynamic completion percentage
+  const maxPossibleScore = studentData.skills.length * 5;
+  const currentTotalScore = studentData.skills.reduce((sum, skill) => sum + skill.score, 0);
+  const progressPercentage = Math.round((currentTotalScore / maxPossibleScore) * 100);
+
+  const handleScoreChange = (skillId: string, newScore: number) => {
+    const updatedSkills = studentData.skills.map((skill) =>
+      skill.id === skillId ? { ...skill, score: newScore } : skill
+    );
+    setStudentData({ ...studentData, skills: updatedSkills });
+  };
+
+  const handleTextChange = (field: "lessonNotes" | "nextGoals", val: string) => {
+    setStudentData({ ...studentData, [field]: val });
+  };
+
+  const handleSaveData = () => {
+    localStorage.setItem("driving_portal_data", JSON.stringify(studentData));
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans antialiased">
-      {/* Top nav */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-100 shadow-sm">
-        <div className="max-w-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Car size={20} className="text-violet-600" />
-            <span className="font-bold text-slate-800 text-sm tracking-tight">
-              DriveLog
-            </span>
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-slate-950">
+      {/* Dynamic Sync Banner */}
+      {showNotification && (
+        <div className="fixed top-4 right-4 bg-emerald-500 text-slate-950 font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 z-50 animate-bounce">
+          <CheckIcon /> Saved & synced live to pupil account!
+        </div>
+      )}
+
+      {/* Header Utilities */}
+      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+              <CarIcon />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                DriveStream
+              </h1>
+              <p className="text-xs text-slate-400 font-medium">Premium Instructor Utility</p>
+            </div>
           </div>
-          {/* Role toggle */}
-          <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-1">
+
+          {/* Toggle Role View Container */}
+          <div className="bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex items-center gap-1">
             <button
-              onClick={() => setRole("instructor")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                role === "instructor"
-                  ? "bg-white text-violet-700 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+              onClick={() => setViewMode("instructor")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                viewMode === "instructor"
+                  ? "bg-emerald-500 text-slate-950 shadow-md"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
               }`}
             >
-              <Users size={13} />
-              Instructor
+              <UserIcon /> Instructor View
             </button>
             <button
-              onClick={() => setRole("pupil")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                role === "pupil"
-                  ? "bg-white text-violet-700 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
+              onClick={() => setViewMode("pupil")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                viewMode === "pupil"
+                  ? "bg-emerald-500 text-slate-950 shadow-md"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
               }`}
             >
-              <User size={13} />
-              Pupil / Parent
+              <UsersIcon /> Pupil / Parent View
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="max-w-xl mx-auto px-4 py-6 pb-16">
-        {role === "instructor" ? (
-          <InstructorView data={data} onSave={handleSave} />
+      {/* Main Workspace Frame */}
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* Profile Snapshot Header Card */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            <div className="w-16 h-16 bg-slate-800 border border-slate-700 rounded-2xl flex items-center justify-center text-2xl font-bold text-emerald-400 shadow-inner">
+              AJ
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-2xl font-bold tracking-tight text-white">{studentData.name}</h2>
+                <span className="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/20">
+                  {studentData.carType}
+                </span>
+              </div>
+              <p className="text-sm text-slate-400 font-medium">Zone coverage: {studentData.location}, UK</p>
+            </div>
+          </div>
+
+          {/* Large Radial/Metric Visual Progress Component */}
+          <div className="flex items-center gap-4 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80 min-w-[240px]">
+            <div className="relative w-14 h-14 flex items-center justify-center bg-slate-900 rounded-full border-2 border-slate-800">
+              <span className="text-sm font-extrabold text-emerald-400">{progressPercentage}%</span>
+            </div>
+            <div>
+              <p className="text-xs uppercase font-bold tracking-wider text-slate-500 mb-0.5">Syllabus Completion</p>
+              <p className="text-sm font-medium text-slate-300">
+                {progressPercentage === 100 ? "Ready for Practical Test!" : "Progressing towards test standard"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CONDITION VIEW DISPATCHER */}
+        {viewMode === "instructor" ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Core Competency Grade Selection Grid (Left Side) */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                  <ClipboardIcon /> Core DVSA Progress Rubric
+                </h3>
+                <span className="text-xs text-slate-500 font-medium">Tap levels to calibrate competency</span>
+              </div>
+
+              {studentData.skills.map((skill) => (
+                <div key={skill.id} className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 transition-all duration-200 shadow-sm">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+                    <div>
+                      <h4 className="font-bold text-white text-base">{skill.name}</h4>
+                      <p className="text-xs text-slate-400 mt-0.5 max-w-md">{skill.description}</p>
+                    </div>
+                    <div className="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800/80 text-right min-w-[120px]">
+                      <span className="text-xs block font-bold text-slate-500 uppercase tracking-wide">Standard</span>
+                      <span className="text-xs font-bold text-emerald-400">{competencyLabels[skill.score]}</span>
+                    </div>
+                  </div>
+
+                  {/* 1-5 Button Array Row */}
+                  <div className="grid grid-cols-5 gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800/80">
+                    {[1, 2, 3, 4, 5].map((level) => {
+                      const isActive = skill.score === level;
+                      return (
+                        <button
+                          key={level}
+                          type="button"
+                          onClick={() => handleScoreChange(skill.id, level)}
+                          className={`py-2.5 text-center text-sm font-bold rounded-lg transition-all duration-150 ${
+                            isActive
+                              ? "bg-gradient-to-b from-emerald-400 to-emerald-500 text-slate-950 shadow-md font-extrabold transform scale-[1.02]"
+                              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Back-Office Notes Entry Station (Right Side) */}
+            <div className="space-y-6">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5 sticky top-28">
+                <h3 className="text-lg font-bold tracking-tight text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <TargetIcon /> Lesson Debrief Notes
+                </h3>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Today's Feedback Note</label>
+                  <textarea
+                    rows={4}
+                    value={studentData.lessonNotes}
+                    onChange={(e) => handleTextChange("lessonNotes", e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl p-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none transition-all resize-none"
+                    placeholder="Provide actionable analysis..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">Next Action Targets</label>
+                  <input
+                    type="text"
+                    value={studentData.nextGoals}
+                    onChange={(e) => handleTextChange("nextGoals", e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none transition-all"
+                    placeholder="Define clear objectives..."
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveData}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/10 flex items-center justify-center gap-2 transition-all duration-200 group active:scale-[0.99]"
+                >
+                  <SaveIcon /> Save & Update Sync
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
-          <PupilView data={data} />
+          /* PUPIL / PARENT VIEW PREVIEW */
+          <div className="space-y-8 max-w-4xl mx-auto">
+            {/* Top Metrics Cards Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 shadow-md">
+                <span className="text-xs uppercase font-bold tracking-wider text-emerald-400 block mb-2">Latest Instructor Feedback</span>
+                <p className="text-sm leading-relaxed text-slate-300 italic">"{studentData.lessonNotes}"</p>
+              </div>
+              <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 shadow-md">
+                <span className="text-xs uppercase font-bold tracking-wider text-teal-400 block mb-2">Target Goals For Next Session</span>
+                <p className="text-sm font-semibold text-slate-200">{studentData.nextGoals}</p>
+              </div>
+            </div>
+
+            {/* Gamified Skill Cards Stack */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold tracking-tight text-white mb-1">Your Detailed Mastery Syllabus</h3>
+              {studentData.skills.map((skill) => {
+                const percentage = (skill.score / 5) * 100;
+                return (
+                  <div key={skill.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-white text-base">{skill.name}</h4>
+                      <p className="text-xs text-slate-400">{skill.description}</p>
+                    </div>
+
+                    <div className="w-full md:w-auto flex items-center gap-4 min-w-[280px]">
+                      {/* Metric visual progress bar indicators */}
+                      <div className="flex-1 bg-slate-950 h-2.5 rounded-full border border-slate-800/60 overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className={`px-3 py-1 rounded-lg text-xs font-extrabold border shrink-0 min-w-[105px] text-center ${
+                        skill.score === 5
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : skill.score >= 3
+                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          : "bg-slate-800 text-slate-400 border-slate-700"
+                      }`}>
+                        {competencyLabels[skill.score]}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </main>
     </div>
