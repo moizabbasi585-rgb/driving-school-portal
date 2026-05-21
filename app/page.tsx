@@ -20,144 +20,179 @@ interface StudentData {
   skills: Skill[];
 }
 
-// ─── INITIAL LUXURY METRICS TEMPLATE ──────────────────────────────────────────
+// ─── INITIAL SKILLS TEMPLATE ──────────────────────────────────────────────────
 const createDefaultSkills = (): Skill[] => [
-  { id: "cockpit", name: "Cockpit Drill & Controls", description: "Safety checks, seating position, mirrors, and instrument mastery.", score: 1 },
-  { id: "junctions", name: "Junctions & Emerging", description: "Approaching safely, observation, zones of vision, and turning left/right.", score: 1 },
-  { id: "roundabouts", name: "Advanced Roundabouts", description: "Lane discipline, spiral roundabouts, signaling, and traffic merging.", score: 1 },
-  { id: "parking", name: "Precision Parallel Parking", description: "Reversing accurately into tight spaces with absolute control.", score: 1 },
-  { id: "speed", name: "Speed Awareness & Progress", description: "Adapting smoothly to road limits, hazards, and traffic flow.", score: 1 },
+  { id: "junctions",   name: "Junctions & Emerging",  description: "Approaching, turning left/right, and safety checks.",                score: 1 },
+  { id: "roundabouts", name: "Roundabouts",            description: "Lane discipline, signaling, and matching traffic flow.",              score: 1 },
+  { id: "parking",     name: "Parallel Parking",       description: "Reversing accurately into a space behind another vehicle.",          score: 1 },
+  { id: "emergency",   name: "Emergency Stop",         description: "Quick control, prompt stopping, and securing the vehicle.",          score: 1 },
 ];
 
 const defaultStudentsList: StudentData[] = [
   {
     id: "alex-jones-101",
     name: "Alex Jones",
-    carType: "Manual (M Performance)",
-    location: "Liverpool City Centre",
-    lessonNotes: "Exceptional steering line control during high-density traffic maneuvers today. Work on checking the left wing mirror prior to changing positioning lane structures.",
-    nextGoals: "Introduce dual-carriageway joining strategies and high-speed braking distances.",
+    carType: "Automatic",
+    location: "Liverpool",
+    lessonNotes: "Great progression on junctions today. Keep working on mirror checks before signaling.",
+    nextGoals: "Introduce spiral roundabouts next week.",
     skills: [
-      { id: "cockpit", name: "Cockpit Drill & Controls", description: "Safety checks, seating position, mirrors, and instrument mastery.", score: 5 },
-      { id: "junctions", name: "Junctions & Emerging", description: "Approaching safely, observation, zones of vision, and turning left/right.", score: 3 },
-      { id: "roundabouts", name: "Advanced Roundabouts", description: "Lane discipline, spiral roundabouts, signaling, and traffic merging.", score: 2 },
-      { id: "parking", name: "Precision Parallel Parking", description: "Reversing accurately into tight spaces with absolute control.", score: 1 },
-      { id: "speed", name: "Speed Awareness & Progress", description: "Adapting smoothly to road limits, hazards, and traffic flow.", score: 4 },
+      { id: "junctions",   name: "Junctions & Emerging",  description: "Approaching, turning left/right, and safety checks.",       score: 3 },
+      { id: "roundabouts", name: "Roundabouts",            description: "Lane discipline, signaling, and matching traffic flow.",    score: 1 },
+      { id: "parking",     name: "Parallel Parking",       description: "Reversing accurately into a space behind another vehicle.",score: 2 },
+      { id: "emergency",   name: "Emergency Stop",         description: "Quick control, prompt stopping, and securing the vehicle.",score: 1 },
     ],
   },
 ];
 
-// ─── PURE SVG PREMIUM MONOCHROME ICONS ────────────────────────────────────────
-const DashboardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+// ─── FAVICON INJECTOR ────────────────────────────────────────────────────────
+function useCarFavicon() {
+  useEffect(() => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+      <rect width="32" height="32" rx="8" fill="#131316"/>
+      <path d="M6 20h2m16 0h2" stroke="#d4a843" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M8 20v-2.5c0-.4.1-.8.4-1.1l2.2-2.9c.3-.4.8-.6 1.3-.6h8.2c.5 0 1 .2 1.3.6l2.2 2.9c.3.3.4.7.4 1.1V20" fill="none" stroke="#d4a843" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="10" cy="20.5" r="2" fill="#d4a843"/>
+      <circle cx="22" cy="20.5" r="2" fill="#d4a843"/>
+      <path d="M12.5 15.5l1.5-2.5h4l1.5 2.5" fill="none" stroke="#8c6514" stroke-width="1" stroke-linejoin="round"/>
+    </svg>`;
+    const encoded = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = encoded;
+    document.title = "DriveStream — ADI Roster";
+  }, []);
+}
+
+// ─── ICONS ───────────────────────────────────────────────────────────────────
+const CarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+    <circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+  </svg>
 );
 const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
 );
-const KeyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
 );
 const SaveIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+    <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+  </svg>
 );
 const LockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
 );
-const ShareIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
 );
 const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/>
+  </svg>
+);
+const ChevronIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9"/>
+  </svg>
 );
 
 const competencyLabels: { [key: number]: string } = {
   1: "Introduced",
-  2: "Guided",
+  2: "Helped",
   3: "Prompted",
   4: "Independent",
-  5: "Test Certified",
+  5: "Test Ready",
 };
 
-export default function PremiumProgressPortal() {
-  const [viewMode, setViewMode] = useState<"instructor" | "pupil">("pupil");
-  const [students, setStudents] = useState<StudentData[]>([]);
-  const [activeId, setActiveId] = useState<string>("");
-  const [isSharedStudent, setIsSharedStudent] = useState(false);
-  
-  // Luxury Live Alerts
-  const [toastMessage, setToastMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
+const competencyColors: { [key: number]: string } = {
+  1: "text-[#5a5854] border-[#2a2a30] bg-[#1a1a1f]",
+  2: "text-[#7a9bbb] border-[#1e3050] bg-[#121e2e]",
+  3: "text-[#c9a84c] border-[#3d2e10] bg-[#1e1708]",
+  4: "text-[#7dbf8a] border-[#1e3d24] bg-[#0e1e12]",
+  5: "text-[#d4a843] border-[#4a3110] bg-[#231806]",
+};
 
-  // Elite Authentication Gate
-  const [isUnlocked, setIsUnlocked] = useState(false);
+// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
+export default function PupilProgressPortal() {
+  useCarFavicon();
+
+  const [viewMode, setViewMode]     = useState<"instructor" | "pupil">("pupil");
+  const [students, setStudents]     = useState<StudentData[]>([]);
+  const [activeId, setActiveId]     = useState<string>("");
+  const [isSharedStudent, setIsSharedStudent] = useState(false);
+
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast]       = useState(false);
+  const [toastType, setToastType]       = useState<"success" | "error">("success");
+
+  const [isUnlocked, setIsUnlocked]       = useState(false);
   const [showPinPrompt, setShowPinPrompt] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
-  
+  const [pinInput, setPinInput]           = useState("");
+  const [pinError, setPinError]           = useState(false);
+  const [pinShake, setPinShake]           = useState(false);
+
   const INSTRUCTOR_PIN = "0702";
 
-  // Form Fields
-  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentName,     setNewStudentName]     = useState("");
   const [newStudentLocation, setNewStudentLocation] = useState("Liverpool");
-  const [newStudentCar, setNewStudentCar] = useState("Manual");
+  const [newStudentCar,      setNewStudentCar]      = useState("Manual");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sharedData = params.get("studentData");
-
     if (sharedData) {
       try {
-        const decodedData = JSON.parse(decodeURIComponent(atob(sharedData)));
-        setStudents([decodedData]);
-        setActiveId(decodedData.id);
+        const decoded = JSON.parse(decodeURIComponent(atob(sharedData)));
+        setStudents([decoded]);
+        setActiveId(decoded.id);
         setViewMode("pupil");
         setIsSharedStudent(true);
         return;
-      } catch (e) {
-        console.error("Link decryption handshake failed", e);
-      }
+      } catch (e) { console.error("Invalid shared link", e); }
     }
-
-    const saved = localStorage.getItem("premium_driving_roster");
+    const saved = localStorage.getItem("driving_school_roster");
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as StudentData[];
-        if (parsed.length > 0) {
-          setStudents(parsed);
-          setActiveId(parsed[0].id);
-          return;
-        }
+        if (parsed.length > 0) { setStudents(parsed); setActiveId(parsed[0].id); return; }
       } catch (e) { /**/ }
     }
-    
     setStudents(defaultStudentsList);
     setActiveId(defaultStudentsList[0].id);
   }, []);
 
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  const triggerToast = (msg: string, type: "success" | "error" = "success") => {
+    setToastMessage(msg); setToastType(type); setShowToast(true);
+    setTimeout(() => setShowToast(false), 3500);
   };
 
   const currentStudent = students.find((s) => s.id === activeId);
 
   const saveToStorage = (updatedList: StudentData[]) => {
-    if (!isSharedStudent) {
-      localStorage.setItem("premium_driving_roster", JSON.stringify(updatedList));
-    }
+    if (!isSharedStudent) localStorage.setItem("driving_school_roster", JSON.stringify(updatedList));
   };
 
   const handleScoreChange = (skillId: string, score: number) => {
-    const updated = students.map((s) => {
-      if (s.id === activeId) {
-        return {
-          ...s,
-          skills: s.skills.map((sk) => (sk.id === skillId ? { ...sk, score } : sk)),
-        };
-      }
-      return s;
-    });
+    const updated = students.map((s) =>
+      s.id === activeId ? { ...s, skills: s.skills.map((sk) => (sk.id === skillId ? { ...sk, score } : sk)) } : s
+    );
     setStudents(updated);
   };
 
@@ -169,140 +204,157 @@ export default function PremiumProgressPortal() {
   const handleAddNewStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStudentName.trim()) return;
-
     const generated: StudentData = {
-      id: `pupil-${Date.now()}`,
+      id: `student-${Date.now()}`,
       name: newStudentName.trim(),
-      carType: `${newStudentCar} Edition`,
+      carType: newStudentCar,
       location: newStudentLocation,
-      lessonNotes: "Initial diagnostics checklist ready for tracking performance parameters.",
-      nextGoals: "Complete primary cockpit systems checklist and gear response calibration.",
+      lessonNotes: "First lesson notes template ready to build.",
+      nextGoals: "Introduce baseline vehicle cockpit drill routines.",
       skills: createDefaultSkills(),
     };
-
     const targetList = [...students, generated];
-    setStudents(targetList);
-    setActiveId(generated.id);
-    saveToStorage(targetList);
-    setNewStudentName("");
-    triggerToast(`Vault Profile Established: ${generated.name}`);
+    setStudents(targetList); setActiveId(generated.id);
+    saveToStorage(targetList); setNewStudentName("");
+    triggerToast(`Profile created for ${generated.name}`);
   };
 
   const handleCopyShareLink = () => {
     if (!currentStudent) return;
     try {
-      const payloadString = btoa(encodeURIComponent(JSON.stringify(currentStudent)));
-      const secureShareUrl = `${window.location.origin}${window.location.pathname}?studentData=${payloadString}`;
-      
-      navigator.clipboard.writeText(secureShareUrl);
-      triggerToast("Telemetry link locked to clipboard. Ready to text pupil.");
-    } catch (err) {
-      triggerToast("Error compilation on structural manifest link maps.");
-    }
+      const payload = btoa(encodeURIComponent(JSON.stringify(currentStudent)));
+      const url = `${window.location.origin}${window.location.pathname}?studentData=${payload}`;
+      navigator.clipboard.writeText(url);
+      triggerToast(`Share link copied for ${currentStudent.name}`);
+    } catch { triggerToast("Failed to generate share link", "error"); }
   };
 
-  const handleSaveAll = () => {
-    saveToStorage(students);
-    triggerToast("All metrics securely cached to local mainframe database.");
-  };
+  const handleSaveAll = () => { saveToStorage(students); triggerToast("All changes saved"); };
 
   const handleViewChange = (mode: "instructor" | "pupil") => {
     if (isSharedStudent) return;
-    if (mode === "instructor" && !isUnlocked) {
-      setShowPinPrompt(true);
-    } else {
-      setViewMode(mode);
-    }
+    if (mode === "instructor" && !isUnlocked) { setShowPinPrompt(true); }
+    else { setViewMode(mode); }
   };
 
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (pinInput === INSTRUCTOR_PIN) {
-      setIsUnlocked(true);
-      setViewMode("instructor");
-      setShowPinPrompt(false);
-      setPinInput("");
-      setPinError(false);
-      triggerToast("Authentication Verified. Welcome Back Commander.");
+      setIsUnlocked(true); setViewMode("instructor");
+      setShowPinPrompt(false); setPinInput(""); setPinError(false);
     } else {
-      setPinError(true);
+      setPinError(true); setPinShake(true);
       setPinInput("");
+      setTimeout(() => setPinShake(false), 500);
     }
   };
 
-  const maxPossibleScore = currentStudent ? currentStudent.skills.length * 5 : 25;
-  const currentTotalScore = currentStudent ? currentStudent.skills.reduce((sum, sk) => sum + sk.score, 0) : 5;
+  const maxPossibleScore   = currentStudent ? currentStudent.skills.length * 5 : 20;
+  const currentTotalScore  = currentStudent ? currentStudent.skills.reduce((sum, sk) => sum + sk.score, 0) : 4;
   const progressPercentage = Math.round((currentTotalScore / maxPossibleScore) * 100);
 
+  // ─── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-neutral-950 text-zinc-100 font-sans antialiased selection:bg-amber-400 selection:text-black">
-      
-      {/* GLOWING LUXURY BANNER ALERT */}
-      <div className={`fixed top-6 right-6 bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-extrabold px-6 py-4 rounded-xl shadow-[0_0_30px_rgba(245,158,11,0.3)] z-50 flex items-center gap-3 border border-yellow-400/40 transition-all duration-500 transform ${showToast ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95 pointer-events-none"}`}>
-        <span className="w-2 h-2 bg-black rounded-full animate-ping" />
-        {toastMessage}
-      </div>
+    <div className="min-h-screen font-sans" style={{ background: "var(--surface-0)", color: "var(--text-primary)" }}>
 
-      {/* TOP DEEP GLOW NAVIGATION ACCENT */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
+      {/* Toast */}
+      {showToast && (
+        <div
+          className="fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm font-medium shadow-2xl"
+          style={{
+            background: toastType === "success" ? "var(--surface-3)" : "#2a1010",
+            border: `1px solid ${toastType === "success" ? "var(--gold-600)" : "#7a1f1f"}`,
+            color: toastType === "success" ? "var(--gold-300)" : "#f08080",
+            animation: "var(--animate-fadeUp)",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <span style={{ color: toastType === "success" ? "var(--gold-400)" : "#e05050" }}>
+            {toastType === "success" ? "✦" : "✕"}
+          </span>
+          {toastMessage}
+        </div>
+      )}
 
-      {/* RENDER HEAD HEADER */}
-      <header className="border-b border-zinc-900 bg-neutral-900/60 backdrop-blur-xl sticky top-0 z-40 shadow-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-5">
-          
-          {/* Logo Assembly */}
-          <div className="flex items-center gap-3.5 group">
-            <div className="p-3 bg-gradient-to-br from-zinc-800 to-zinc-900 text-amber-400 rounded-xl border border-zinc-700 shadow-inner group-hover:border-amber-400/40 transition-all duration-500 transform group-hover:rotate-[10deg]">
-              <DashboardIcon />
+      {/* Header */}
+      <header
+        className="sticky top-0 z-40"
+        style={{
+          background: "rgba(13,13,15,0.85)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid var(--border-subtle)",
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div
+              className="flex items-center justify-center w-9 h-9 rounded-xl"
+              style={{ background: "var(--surface-2)", border: "1px solid var(--border-mid)", color: "var(--gold-400)" }}
+            >
+              <CarIcon />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-zinc-100 via-amber-300 to-yellow-500 bg-clip-text text-transparent">
-                VELOCITY
+              <h1
+                className="text-base font-semibold tracking-tight leading-none"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif", color: "var(--gold-300)", letterSpacing: "-0.02em" }}
+              >
+                DriveStream
               </h1>
-              <p className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold">Elite Driving Intelligence</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase", fontSize: "10px", fontWeight: 500 }}>
+                ADI Roster Manager
+              </p>
             </div>
           </div>
 
-          {/* Secure Interactive Switch Toggle Panels */}
           {!isSharedStudent && (
-            <div className="bg-black/80 p-1.5 rounded-xl border border-zinc-800 shadow-2xl flex items-center gap-1.5">
-              <button
-                onClick={() => handleViewChange("instructor")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
-                  viewMode === "instructor" 
-                    ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black shadow-[0_4px_15px_rgba(245,158,11,0.25)] font-black" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50"
-                }`}
-              >
-                <KeyIcon /> {isUnlocked ? "Cockpit Active" : "Secure Login"}
-              </button>
-              <button
-                onClick={() => handleViewChange("pupil")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
-                  viewMode === "pupil" 
-                    ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black shadow-[0_4px_15px_rgba(245,158,11,0.25)] font-black" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50"
-                }`}
-              >
-                <UserIcon /> Pupil Display
-              </button>
+            <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "var(--surface-2)", border: "1px solid var(--border-subtle)" }}>
+              {(["instructor", "pupil"] as const).map((mode) => {
+                const active = viewMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => handleViewChange(mode)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all"
+                    style={{
+                      background: active ? "var(--gold-500)" : "transparent",
+                      color: active ? "#0d0d0f" : "var(--text-secondary)",
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    {mode === "instructor" ? <><UserIcon />{isUnlocked ? "Instructor" : "Enter PIN"}</> : <><UsersIcon />Pupil View</>}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
       </header>
 
-      {/* AUTH SYSTEM SLIDE DIALOG CAPTURE GRID */}
+      {/* PIN Modal */}
       {showPinPrompt && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all animate-fadeIn">
-          <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-800 p-8 rounded-2xl max-w-sm w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-5 transform transition-all scale-100">
-            <div className="text-center space-y-2">
-              <div className="w-14 h-14 bg-amber-500/5 text-amber-400 rounded-full flex items-center justify-center mx-auto border border-amber-500/20 mb-1 animate-pulse">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(16px)" }}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl p-7 space-y-6"
+            style={{ background: "var(--surface-2)", border: "1px solid var(--border-mid)", animation: "var(--animate-fadeUp)" }}
+          >
+            <div className="text-center space-y-3">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto"
+                style={{ background: "var(--surface-3)", border: "1px solid var(--border-mid)", color: "var(--gold-400)" }}
+              >
                 <LockIcon />
               </div>
-              <h3 className="text-xl font-black text-zinc-100 tracking-tight">Identity Validation</h3>
-              <p className="text-xs text-zinc-400">Provide the encrypted 4-digit system master code.</p>
+              <div>
+                <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)", fontFamily: "'DM Serif Display', serif" }}>
+                  Instructor Access
+                </h3>
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Enter your 4-digit security PIN</p>
+              </div>
             </div>
-            
+
             <form onSubmit={handlePinSubmit} className="space-y-4">
               <input
                 type="password"
@@ -310,165 +362,264 @@ export default function PremiumProgressPortal() {
                 autoFocus
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
-                placeholder="••••"
-                className="w-full text-center tracking-[1.5em] font-mono text-2xl bg-black border border-zinc-800 focus:border-amber-400 rounded-xl py-3.5 text-amber-400 focus:outline-none shadow-inner transition-all duration-300 focus:shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                placeholder="····"
+                className="w-full text-center text-2xl tracking-[0.5em] py-3 rounded-xl transition-all focus:outline-none"
+                style={{
+                  background: "var(--surface-0)",
+                  border: `1px solid ${pinError ? "#7a2020" : "var(--border-mid)"}`,
+                  color: pinError ? "#f08080" : "var(--gold-300)",
+                  animation: pinShake ? "var(--animate-shake)" : "none",
+                  fontFamily: "monospace",
+                }}
               />
-              {pinError && <p className="text-xs text-rose-500 text-center font-bold tracking-wide animate-shake">Access Denied. Pin Code Invalid.</p>}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <button type="button" onClick={() => { setShowPinPrompt(false); setPinInput(""); setPinError(false); }} className="bg-zinc-950 hover:bg-zinc-900 text-zinc-400 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border border-zinc-800 transition-all transform active:scale-95">Cancel</button>
-                <button type="submit" className="bg-gradient-to-b from-amber-400 to-yellow-500 text-black font-black py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition-all transform active:scale-95">Verify</button>
+              {pinError && (
+                <p className="text-xs text-center" style={{ color: "#e05050" }}>Incorrect PIN — try again</p>
+              )}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => { setShowPinPrompt(false); setPinInput(""); setPinError(false); }}
+                  className="py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-80"
+                  style={{ background: "var(--surface-3)", color: "var(--text-secondary)", border: "1px solid var(--border-subtle)" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="py-2.5 rounded-xl text-sm font-semibold transition-all hover:brightness-110"
+                  style={{ background: "var(--gold-500)", color: "#0d0d0f" }}
+                >
+                  Unlock
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* CORE WORKSPACE CONSOLE WRAPPER */}
-      <main className="max-w-6xl mx-auto px-6 py-10 transition-opacity duration-500 animate-fadeIn">
-        
-        {/* UPPER PANEL CONTROL CONSOLE FOR MANAGING DRIVING ROSTER */}
+      {/* Main */}
+      <main className="max-w-6xl mx-auto px-6 py-8">
+
+        {/* Instructor Control Bar */}
         {viewMode === "instructor" && !isSharedStudent && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 border border-zinc-800/80 rounded-2xl p-6 mb-10 shadow-2xl backdrop-blur-sm transform transition-all duration-300 hover:border-zinc-700/50">
-            
+          <div
+            className="rounded-2xl p-5 mb-8 grid grid-cols-1 md:grid-cols-3 gap-5"
+            style={{ background: "var(--surface-1)", border: "1px solid var(--border-subtle)" }}
+          >
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Select Live Student Dossier</label>
-              <select
-                value={activeId}
-                onChange={(e) => setActiveId(e.target.value)}
-                className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl p-3 text-xs font-bold focus:outline-none focus:border-amber-400 transition-all cursor-pointer shadow-inner"
-              >
-                {students.map((st) => (
-                  <option key={st.id} value={st.id}>{st.name} — [{st.location}]</option>
-                ))}
-              </select>
+              <label className="text-xs font-semibold uppercase tracking-widest block" style={{ color: "var(--text-muted)" }}>
+                Active Profile
+              </label>
+              <div className="relative">
+                <select
+                  value={activeId}
+                  onChange={(e) => setActiveId(e.target.value)}
+                  className="w-full appearance-none rounded-xl px-3 py-2.5 text-sm font-medium pr-9 focus:outline-none transition-all"
+                  style={{
+                    background: "var(--surface-0)",
+                    border: "1px solid var(--border-mid)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  {students.map((st) => (
+                    <option key={st.id} value={st.id}>{st.name} — {st.location}</option>
+                  ))}
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }}>
+                  <ChevronIcon />
+                </span>
+              </div>
             </div>
 
-            <form onSubmit={handleAddNewStudent} className="md:col-span-2 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-              <div className="sm:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Inscribe New Pupil Profile</label>
+            <form onSubmit={handleAddNewStudent} className="md:col-span-2 grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest block" style={{ color: "var(--text-muted)" }}>New Pupil</label>
                 <input
                   type="text"
                   required
-                  placeholder="Full Legal Name"
+                  placeholder="e.g. Sarah Smith"
                   value={newStudentName}
                   onChange={(e) => setNewStudentName(e.target.value)}
-                  className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-amber-400 transition-all placeholder-zinc-600 shadow-inner"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all"
+                  style={{ background: "var(--surface-0)", border: "1px solid var(--border-mid)", color: "var(--text-primary)" }}
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Transmission</label>
-                <select
-                  value={newStudentCar}
-                  onChange={(e) => setNewStudentCar(e.target.value)}
-                  className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl p-3 text-xs font-bold focus:outline-none focus:border-amber-400"
-                >
-                  <option value="Manual">Manual Fleet</option>
-                  <option value="Automatic">Automatic Fleet</option>
-                </select>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-widest block" style={{ color: "var(--text-muted)" }}>Gearbox</label>
+                <div className="relative">
+                  <select
+                    value={newStudentCar}
+                    onChange={(e) => setNewStudentCar(e.target.value)}
+                    className="w-full appearance-none rounded-xl px-3 py-2.5 text-sm pr-8 focus:outline-none"
+                    style={{ background: "var(--surface-0)", border: "1px solid var(--border-mid)", color: "var(--text-primary)" }}
+                  >
+                    <option value="Manual">Manual</option>
+                    <option value="Automatic">Automatic</option>
+                  </select>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }}>
+                    <ChevronIcon />
+                  </span>
+                </div>
               </div>
-              <button type="submit" className="bg-zinc-800 hover:bg-amber-400 hover:text-black border border-zinc-700 text-zinc-200 font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 transform active:scale-95 shadow-md">
-                <PlusIcon /> Initialize
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all hover:brightness-110"
+                style={{ background: "var(--gold-500)", color: "#0d0d0f" }}
+              >
+                <PlusIcon /> Add
               </button>
             </form>
           </div>
         )}
 
-        {/* DRIVING STUDENT IDENTITY METRIC CARD */}
+        {/* Student Card */}
         {currentStudent ? (
-          <div className="space-y-8">
-            
-            {/* MASTER PROFILE DISPLAY COCKPIT HEADER */}
-            <div className="bg-gradient-to-br from-zinc-900 via-neutral-950 to-black border border-zinc-800 rounded-3xl p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 group-hover:bg-amber-500/10 transition-all duration-700" />
-              
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-zinc-800 to-zinc-950 border border-zinc-700 rounded-2xl flex items-center justify-center text-3xl font-black text-amber-400 shadow-2xl transform transition-transform duration-500 group-hover:scale-105">
-                  {currentStudent.name.split(" ").map(n => n[0]).join("")}
+          <>
+            <div
+              className="rounded-3xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6"
+              style={{ background: "var(--surface-1)", border: "1px solid var(--border-subtle)" }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold shrink-0"
+                  style={{
+                    background: "var(--surface-3)",
+                    border: "1px solid var(--border-mid)",
+                    color: "var(--gold-400)",
+                    fontFamily: "'DM Serif Display', serif",
+                  }}
+                >
+                  {currentStudent.name.split(" ").map((n) => n[0]).join("")}
                 </div>
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-3xl font-black tracking-tight text-white">{currentStudent.name}</h2>
-                    <span className="px-3 py-1 bg-zinc-800/80 text-zinc-300 text-[10px] font-black uppercase tracking-widest rounded-md border border-zinc-700 shadow-inner">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h2
+                      className="text-xl font-bold tracking-tight"
+                      style={{ fontFamily: "'DM Serif Display', serif", color: "var(--text-primary)" }}
+                    >
+                      {currentStudent.name}
+                    </h2>
+                    <span
+                      className="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      style={{ background: "var(--surface-3)", color: "var(--text-secondary)", border: "1px solid var(--border-mid)" }}
+                    >
                       {currentStudent.carType}
                     </span>
                     {isSharedStudent && (
-                      <span className="px-3 py-1 bg-amber-500/10 text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-md border border-amber-400/20 animate-pulse">
-                        Encrypted Data Live Link
+                      <span
+                        className="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: "var(--surface-3)", color: "var(--gold-400)", border: "1px solid var(--gold-600)" }}
+                      >
+                        Live Share
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-zinc-400 font-medium tracking-wide flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" /> Operational Radius: {currentStudent.location}, UK
-                  </p>
+                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>{currentStudent.location}, UK</p>
                 </div>
               </div>
 
-              {/* ACTION COMMAND CONTROLS HUD */}
-              <div className="flex flex-wrap items-center gap-4 relative z-10">
+              <div className="flex flex-wrap items-center gap-3">
                 {viewMode === "instructor" && !isSharedStudent && (
                   <button
                     onClick={handleCopyShareLink}
-                    className="bg-black hover:bg-zinc-900 text-amber-400 border border-amber-400/30 font-black py-4 px-5 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl transition-all duration-300 transform active:scale-95 hover:border-amber-400"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:brightness-110"
+                    style={{ background: "var(--surface-3)", color: "var(--gold-300)", border: "1px solid var(--gold-600)" }}
                   >
-                    <ShareIcon /> Dispatch Telemetry Link
+                    <CopyIcon /> Copy Share Link
                   </button>
                 )}
 
-                <div className="flex items-center gap-4 bg-black/60 px-5 py-4 rounded-2xl border border-zinc-800/80 min-w-[220px] shadow-inner">
-                  <div className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 rounded-full border-2 border-zinc-800 text-base font-black text-amber-400 shadow-xl overflow-hidden group-hover:border-amber-400/40 transition-colors duration-500">
-                    <div className="absolute inset-0 bg-amber-400/5 animate-pulse" />
-                    {progressPercentage}%
+                <div
+                  className="flex items-center gap-4 px-4 py-3 rounded-2xl"
+                  style={{ background: "var(--surface-2)", border: "1px solid var(--border-subtle)" }}
+                >
+                  {/* Circular progress */}
+                  <div className="relative w-11 h-11 shrink-0">
+                    <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: "rotate(-90deg)" }}>
+                      <circle cx="22" cy="22" r="18" fill="none" stroke="var(--surface-3)" strokeWidth="3" />
+                      <circle
+                        cx="22" cy="22" r="18" fill="none"
+                        stroke="var(--gold-500)" strokeWidth="3"
+                        strokeDasharray={`${2 * Math.PI * 18}`}
+                        strokeDashoffset={`${2 * Math.PI * 18 * (1 - progressPercentage / 100)}`}
+                        strokeLinecap="round"
+                        style={{ transition: "stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1)" }}
+                      />
+                    </svg>
+                    <span
+                      className="absolute inset-0 flex items-center justify-center text-xs font-bold"
+                      style={{ color: "var(--gold-300)" }}
+                    >
+                      {progressPercentage}%
+                    </span>
                   </div>
                   <div>
-                    <p className="text-[9px] uppercase font-black tracking-widest text-zinc-500 mb-0.5">Syllabus Quotient</p>
-                    <p className="text-xs text-zinc-200 font-bold tracking-wide">
-                      {progressPercentage === 100 ? "DVSA Test Standard Certified" : "Performance Calibration Path"}
+                    <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)", fontSize: "9px" }}>Progress</p>
+                    <p className="text-xs font-medium mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                      {progressPercentage === 100 ? "Test Ready!" : "On Track"}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* LOWER CONTENT DIVISION ACCORDING TO USER PERMISSIONS */}
+            {/* ── INSTRUCTOR VIEW ── */}
             {viewMode === "instructor" && !isSharedStudent ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                {/* INSTRUCTOR INPUT GRID SCALE */}
-                <div className="lg:col-span-2 space-y-4">
+                <div className="lg:col-span-2 space-y-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2"> Spheroid Competency Matrices</h3>
-                    <button onClick={() => setViewMode("pupil")} className="text-[10px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1.5 bg-rose-500/5 px-2.5 py-1 rounded-md border border-rose-500/10">
-                      <LockIcon /> Lock Terminals
+                    <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)", fontFamily: "'DM Serif Display', serif" }}>
+                      Syllabus Mastery
+                    </h3>
+                    <button
+                      onClick={() => setViewMode("pupil")}
+                      className="flex items-center gap-1.5 text-xs font-medium transition-all hover:opacity-70"
+                      style={{ color: "#c06060" }}
+                    >
+                      <LockIcon /> Lock
                     </button>
                   </div>
 
-                  {currentStudent.skills.map((skill) => (
-                    <div key={skill.id} className="bg-gradient-to-b from-zinc-900/40 to-black border border-zinc-800/80 rounded-2xl p-6 transition-all duration-300 transform hover:translate-x-1 hover:border-zinc-700 shadow-md">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
-                        <div className="space-y-0.5">
-                          <h4 className="font-extrabold text-white text-base tracking-tight">{skill.name}</h4>
-                          <p className="text-xs text-zinc-400 leading-relaxed max-w-xl">{skill.description}</p>
+                  {currentStudent.skills.map((skill, i) => (
+                    <div
+                      key={skill.id}
+                      className="rounded-2xl p-5"
+                      style={{
+                        background: "var(--surface-1)",
+                        border: "1px solid var(--border-subtle)",
+                        animation: `var(--animate-fadeUp)`,
+                        animationDelay: `${i * 60}ms`,
+                        animationFillMode: "forwards",
+                        opacity: 0,
+                      }}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                          <h4 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{skill.name}</h4>
+                          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{skill.description}</p>
                         </div>
-                        <div className="bg-black px-3 py-1.5 rounded-xl border border-zinc-800 text-center sm:text-right min-w-[130px] shadow-inner">
-                          <span className="text-[9px] block font-black text-zinc-500 uppercase tracking-widest">Calibration</span>
-                          <span className="text-xs font-black text-amber-400 uppercase tracking-wide">{competencyLabels[skill.score]}</span>
-                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-lg text-xs font-semibold border shrink-0 ${competencyColors[skill.score]}`}
+                        >
+                          {competencyLabels[skill.score]}
+                        </span>
                       </div>
 
-                      {/* Animated Score Bar Matrix Buttons */}
-                      <div className="grid grid-cols-5 gap-2 bg-black p-1.5 rounded-xl border border-zinc-900 shadow-inner">
+                      <div className="grid grid-cols-5 gap-1.5 p-1 rounded-xl" style={{ background: "var(--surface-0)", border: "1px solid var(--border-subtle)" }}>
                         {[1, 2, 3, 4, 5].map((level) => {
-                          const isCurrent = skill.score === level;
+                          const active = skill.score === level;
                           return (
                             <button
                               key={level}
                               type="button"
                               onClick={() => handleScoreChange(skill.id, level)}
-                              className={`py-3 text-center text-xs font-black rounded-lg transition-all duration-300 transform active:scale-95 ${
-                                isCurrent 
-                                  ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black font-black scale-[1.02] shadow-[0_4px_12px_rgba(245,158,11,0.2)]" 
-                                  : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900"
-                              }`}
+                              className="py-2 text-center text-xs font-bold rounded-lg transition-all"
+                              style={{
+                                background: active ? "var(--gold-500)" : "transparent",
+                                color: active ? "#0d0d0f" : "var(--text-muted)",
+                                border: active ? "none" : "1px solid transparent",
+                                transform: active ? "scale(1.03)" : "scale(1)",
+                              }}
                             >
                               {level}
                             </button>
@@ -479,82 +630,130 @@ export default function PremiumProgressPortal() {
                   ))}
                 </div>
 
-                {/* LESSON SUMMARY TEXT DEBRIEF COLUMN ENTRY */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-b from-zinc-900 via-zinc-950 to-black border border-zinc-800 rounded-3xl p-6 shadow-2xl space-y-6 sticky top-28 transition-all duration-300 hover:border-zinc-700/60">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-zinc-200 border-b border-zinc-800 pb-3">Session Log Debrief</h3>
-                    
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block">Performance Analysis Statements</label>
+                {/* Notes Panel */}
+                <div>
+                  <div
+                    className="rounded-3xl p-6 sticky top-24 space-y-5"
+                    style={{ background: "var(--surface-1)", border: "1px solid var(--border-subtle)" }}
+                  >
+                    <h3 className="text-base font-semibold pb-3" style={{ color: "var(--text-primary)", fontFamily: "'DM Serif Display', serif", borderBottom: "1px solid var(--border-subtle)" }}>
+                      Debrief
+                    </h3>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-widest block" style={{ color: "var(--text-muted)" }}>
+                        Lesson Notes
+                      </label>
                       <textarea
-                        rows={5}
+                        rows={4}
                         value={currentStudent.lessonNotes}
                         onChange={(e) => handleTextChange("lessonNotes", e.target.value)}
-                        className="w-full bg-black border border-zinc-800 focus:border-amber-400 rounded-xl p-4 text-xs font-semibold leading-relaxed text-zinc-200 placeholder-zinc-700 focus:outline-none transition-all resize-none shadow-inner focus:shadow-[0_0_15px_rgba(245,158,11,0.05)]"
+                        className="w-full rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none transition-all"
+                        style={{
+                          background: "var(--surface-0)",
+                          border: "1px solid var(--border-mid)",
+                          color: "var(--text-secondary)",
+                        }}
                       />
                     </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block">Next Target Benchmark Objectives</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-widest block" style={{ color: "var(--text-muted)" }}>
+                        Next Goals
+                      </label>
                       <input
                         type="text"
                         value={currentStudent.nextGoals}
                         onChange={(e) => handleTextChange("nextGoals", e.target.value)}
-                        className="w-full bg-black border border-zinc-800 focus:border-amber-400 rounded-xl px-4 py-3.5 text-xs font-bold text-zinc-200 focus:outline-none transition-all shadow-inner"
+                        className="w-full rounded-xl px-3 py-2.5 text-sm focus:outline-none transition-all"
+                        style={{
+                          background: "var(--surface-0)",
+                          border: "1px solid var(--border-mid)",
+                          color: "var(--text-secondary)",
+                        }}
                       />
                     </div>
-
                     <button
                       type="button"
                       onClick={handleSaveAll}
-                      className="w-full bg-gradient-to-b from-zinc-800 to-zinc-900 hover:from-amber-400 hover:to-yellow-500 hover:text-black border border-zinc-700 hover:border-transparent text-zinc-200 font-black py-4 rounded-xl shadow-xl text-xs uppercase tracking-widest transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:brightness-110"
+                      style={{ background: "var(--gold-500)", color: "#0d0d0f" }}
                     >
-                      <SaveIcon /> Commit Cache Matrix
+                      <SaveIcon /> Save Changes
                     </button>
                   </div>
                 </div>
               </div>
             ) : (
-              /* CLEAN LUXURY PUPIL SMARTPHONE PORTAL HOUSING */
-              <div className="space-y-8 max-w-4xl mx-auto transition-all animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-zinc-900/50 to-black border border-zinc-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-zinc-700 transition-all">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400" />
-                    <span className="text-[9px] uppercase font-black tracking-widest text-amber-400 block mb-2">Master Flight Instructor Assessment</span>
-                    <p className="text-xs leading-relaxed text-zinc-300 font-medium italic">&quot;{currentStudent.lessonNotes}&quot;</p>
+              /* ── PUPIL VIEW ── */
+              <div className="space-y-6 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    className="rounded-2xl p-5"
+                    style={{ background: "var(--surface-1)", border: "1px solid var(--border-subtle)" }}
+                  >
+                    <span className="text-xs font-semibold uppercase tracking-widest block mb-2" style={{ color: "var(--gold-400)" }}>
+                      Instructor Feedback
+                    </span>
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)", fontStyle: "italic" }}>
+                      "{currentStudent.lessonNotes}"
+                    </p>
                   </div>
-                  <div className="bg-gradient-to-br from-zinc-900/50 to-black border border-zinc-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-zinc-700 transition-all">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-yellow-500" />
-                    <span className="text-[9px] uppercase font-black tracking-widest text-yellow-500 block mb-2">Target Milestones For Next Deployment</span>
-                    <p className="text-xs font-black text-zinc-100 tracking-wide leading-relaxed">{currentStudent.nextGoals}</p>
+                  <div
+                    className="rounded-2xl p-5"
+                    style={{ background: "var(--surface-1)", border: "1px solid var(--border-subtle)" }}
+                  >
+                    <span className="text-xs font-semibold uppercase tracking-widest block mb-2" style={{ color: "#7dbf8a" }}>
+                      Next Session Targets
+                    </span>
+                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{currentStudent.nextGoals}</p>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400 tracking-wider mb-2">Syllabus Completion Index</h3>
-                  {currentStudent.skills.map((skill) => {
-                    const barPercent = (skill.score / 5) * 100;
-                    const isPerfect = skill.score === 5;
+                <div className="space-y-3">
+                  <h3
+                    className="text-base font-semibold"
+                    style={{ color: "var(--text-primary)", fontFamily: "'DM Serif Display', serif" }}
+                  >
+                    Syllabus Progress
+                  </h3>
+                  {currentStudent.skills.map((skill, i) => {
+                    const pct = (skill.score / 5) * 100;
                     return (
-                      <div key={skill.id} className="bg-gradient-to-b from-zinc-900/30 to-black border border-zinc-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md group hover:border-zinc-700/80 transition-all duration-300">
-                        <div className="space-y-1">
-                          <h4 className="font-extrabold text-white text-base tracking-tight">{skill.name}</h4>
-                          <p className="text-xs text-zinc-400 leading-relaxed max-w-lg">{skill.description}</p>
+                      <div
+                        key={skill.id}
+                        className="rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        style={{
+                          background: "var(--surface-1)",
+                          border: "1px solid var(--border-subtle)",
+                          animation: `var(--animate-fadeUp)`,
+                          animationDelay: `${i * 70}ms`,
+                          animationFillMode: "forwards",
+                          opacity: 0,
+                        }}
+                      >
+                        <div>
+                          <h4 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{skill.name}</h4>
+                          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{skill.description}</p>
                         </div>
-                        <div className="w-full sm:w-auto flex items-center gap-5 min-w-[280px]">
-                          <div className="flex-1 bg-black h-2 rounded-full border border-zinc-900 overflow-hidden p-[1px] shadow-inner">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                                isPerfect ? "bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "bg-zinc-700"
-                              }`} 
-                              style={{ width: `${barPercent}%` }} 
+                        <div className="flex items-center gap-3 sm:min-w-[260px]">
+                          <div
+                            className="flex-1 h-1.5 rounded-full overflow-hidden"
+                            style={{ background: "var(--surface-0)", border: "1px solid var(--border-subtle)" }}
+                          >
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{
+                                width: `${pct}%`,
+                                background: skill.score === 5
+                                  ? "linear-gradient(90deg, var(--gold-500), var(--gold-300))"
+                                  : skill.score >= 3
+                                  ? "linear-gradient(90deg, #5a8a65, #7dbf8a)"
+                                  : "var(--surface-3)",
+                              }}
                             />
                           </div>
-                          <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border shrink-0 min-w-[115px] text-center shadow-sm transition-all duration-300 ${
-                            isPerfect 
-                              ? "bg-amber-400/10 text-amber-400 border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]" 
-                              : "bg-zinc-900 text-zinc-500 border-zinc-800"
-                          }`}>
+                          <span
+                            className={`px-3 py-1 rounded-lg text-xs font-semibold border shrink-0 min-w-[100px] text-center ${competencyColors[skill.score]}`}
+                          >
                             {competencyLabels[skill.score]}
                           </span>
                         </div>
@@ -566,580 +765,9 @@ export default function PremiumProgressPortal() {
             )}
           </>
         ) : (
-          <div className="text-center py-16 bg-neutral-900/30 rounded-2xl border border-zinc-800 text-zinc-500 text-xs uppercase tracking-widest font-black">No Active Student Records Registered in System.</div>
-        )}
-      </main>
-    </div>
-  );
-}"use client";
-
-import { useEffect, useState } from "react";
-
-// ─── TYPES ───────────────────────────────────────────────────────────────────
-interface Skill {
-  id: string;
-  name: string;
-  description: string;
-  score: number;
-}
-
-interface StudentData {
-  id: string;
-  name: string;
-  carType: string;
-  location: string;
-  lessonNotes: string;
-  nextGoals: string;
-  skills: Skill[];
-}
-
-// ─── INITIAL LUXURY METRICS TEMPLATE ──────────────────────────────────────────
-const createDefaultSkills = (): Skill[] => [
-  { id: "cockpit", name: "Cockpit Drill & Controls", description: "Safety checks, seating position, mirrors, and instrument mastery.", score: 1 },
-  { id: "junctions", name: "Junctions & Emerging", description: "Approaching safely, observation, zones of vision, and turning left/right.", score: 1 },
-  { id: "roundabouts", name: "Advanced Roundabouts", description: "Lane discipline, spiral roundabouts, signaling, and traffic merging.", score: 1 },
-  { id: "parking", name: "Precision Parallel Parking", description: "Reversing accurately into tight spaces with absolute control.", score: 1 },
-  { id: "speed", name: "Speed Awareness & Progress", description: "Adapting smoothly to road limits, hazards, and traffic flow.", score: 1 },
-];
-
-const defaultStudentsList: StudentData[] = [
-  {
-    id: "alex-jones-101",
-    name: "Alex Jones",
-    carType: "Manual (M Performance)",
-    location: "Liverpool City Centre",
-    lessonNotes: "Exceptional steering line control during high-density traffic maneuvers today. Work on checking the left wing mirror prior to changing positioning lane structures.",
-    nextGoals: "Introduce dual-carriageway joining strategies and high-speed braking distances.",
-    skills: [
-      { id: "cockpit", name: "Cockpit Drill & Controls", description: "Safety checks, seating position, mirrors, and instrument mastery.", score: 5 },
-      { id: "junctions", name: "Junctions & Emerging", description: "Approaching safely, observation, zones of vision, and turning left/right.", score: 3 },
-      { id: "roundabouts", name: "Advanced Roundabouts", description: "Lane discipline, spiral roundabouts, signaling, and traffic merging.", score: 2 },
-      { id: "parking", name: "Precision Parallel Parking", description: "Reversing accurately into tight spaces with absolute control.", score: 1 },
-      { id: "speed", name: "Speed Awareness & Progress", description: "Adapting smoothly to road limits, hazards, and traffic flow.", score: 4 },
-    ],
-  },
-];
-
-// ─── PURE SVG PREMIUM MONOCHROME ICONS ────────────────────────────────────────
-const DashboardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-);
-const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-);
-const KeyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
-);
-const SaveIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-);
-const LockIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-);
-const ShareIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-);
-const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-);
-
-const competencyLabels: { [key: number]: string } = {
-  1: "Introduced",
-  2: "Guided",
-  3: "Prompted",
-  4: "Independent",
-  5: "Test Certified",
-};
-
-export default function PremiumProgressPortal() {
-  const [viewMode, setViewMode] = useState<"instructor" | "pupil">("pupil");
-  const [students, setStudents] = useState<StudentData[]>([]);
-  const [activeId, setActiveId] = useState<string>("");
-  const [isSharedStudent, setIsSharedStudent] = useState(false);
-  
-  // Luxury Live Alerts
-  const [toastMessage, setToastMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
-
-  // Elite Authentication Gate
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [showPinPrompt, setShowPinPrompt] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
-  
-  const INSTRUCTOR_PIN = "0702";
-
-  // Form Fields
-  const [newStudentName, setNewStudentName] = useState("");
-  const [newStudentLocation, setNewStudentLocation] = useState("Liverpool");
-  const [newStudentCar, setNewStudentCar] = useState("Manual");
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sharedData = params.get("studentData");
-
-    if (sharedData) {
-      try {
-        const decodedData = JSON.parse(decodeURIComponent(atob(sharedData)));
-        setStudents([decodedData]);
-        setActiveId(decodedData.id);
-        setViewMode("pupil");
-        setIsSharedStudent(true);
-        return;
-      } catch (e) {
-        console.error("Link decryption handshake failed", e);
-      }
-    }
-
-    const saved = localStorage.getItem("premium_driving_roster");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as StudentData[];
-        if (parsed.length > 0) {
-          setStudents(parsed);
-          setActiveId(parsed[0].id);
-          return;
-        }
-      } catch (e) { /**/ }
-    }
-    
-    setStudents(defaultStudentsList);
-    setActiveId(defaultStudentsList[0].id);
-  }, []);
-
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
-
-  const currentStudent = students.find((s) => s.id === activeId);
-
-  const saveToStorage = (updatedList: StudentData[]) => {
-    if (!isSharedStudent) {
-      localStorage.setItem("premium_driving_roster", JSON.stringify(updatedList));
-    }
-  };
-
-  const handleScoreChange = (skillId: string, score: number) => {
-    const updated = students.map((s) => {
-      if (s.id === activeId) {
-        return {
-          ...s,
-          skills: s.skills.map((sk) => (sk.id === skillId ? { ...sk, score } : sk)),
-        };
-      }
-      return s;
-    });
-    setStudents(updated);
-  };
-
-  const handleTextChange = (field: "lessonNotes" | "nextGoals", text: string) => {
-    const updated = students.map((s) => (s.id === activeId ? { ...s, [field]: text } : s));
-    setStudents(updated);
-  };
-
-  const handleAddNewStudent = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStudentName.trim()) return;
-
-    const generated: StudentData = {
-      id: `pupil-${Date.now()}`,
-      name: newStudentName.trim(),
-      carType: `${newStudentCar} Edition`,
-      location: newStudentLocation,
-      lessonNotes: "Initial diagnostics checklist ready for tracking performance parameters.",
-      nextGoals: "Complete primary cockpit systems checklist and gear response calibration.",
-      skills: createDefaultSkills(),
-    };
-
-    const targetList = [...students, generated];
-    setStudents(targetList);
-    setActiveId(generated.id);
-    saveToStorage(targetList);
-    setNewStudentName("");
-    triggerToast(`Vault Profile Established: ${generated.name}`);
-  };
-
-  const handleCopyShareLink = () => {
-    if (!currentStudent) return;
-    try {
-      const payloadString = btoa(encodeURIComponent(JSON.stringify(currentStudent)));
-      const secureShareUrl = `${window.location.origin}${window.location.pathname}?studentData=${payloadString}`;
-      
-      navigator.clipboard.writeText(secureShareUrl);
-      triggerToast("Telemetry link locked to clipboard. Ready to text pupil.");
-    } catch (err) {
-      triggerToast("Error compilation on structural manifest link maps.");
-    }
-  };
-
-  const handleSaveAll = () => {
-    saveToStorage(students);
-    triggerToast("All metrics securely cached to local mainframe database.");
-  };
-
-  const handleViewChange = (mode: "instructor" | "pupil") => {
-    if (isSharedStudent) return;
-    if (mode === "instructor" && !isUnlocked) {
-      setShowPinPrompt(true);
-    } else {
-      setViewMode(mode);
-    }
-  };
-
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === INSTRUCTOR_PIN) {
-      setIsUnlocked(true);
-      setViewMode("instructor");
-      setShowPinPrompt(false);
-      setPinInput("");
-      setPinError(false);
-      triggerToast("Authentication Verified. Welcome Back Commander.");
-    } else {
-      setPinError(true);
-      setPinInput("");
-    }
-  };
-
-  const maxPossibleScore = currentStudent ? currentStudent.skills.length * 5 : 25;
-  const currentTotalScore = currentStudent ? currentStudent.skills.reduce((sum, sk) => sum + sk.score, 0) : 5;
-  const progressPercentage = Math.round((currentTotalScore / maxPossibleScore) * 100);
-
-  return (
-    <div className="min-h-screen bg-neutral-950 text-zinc-100 font-sans antialiased selection:bg-amber-400 selection:text-black">
-      
-      {/* GLOWING LUXURY BANNER ALERT */}
-      <div className={`fixed top-6 right-6 bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-extrabold px-6 py-4 rounded-xl shadow-[0_0_30px_rgba(245,158,11,0.3)] z-50 flex items-center gap-3 border border-yellow-400/40 transition-all duration-500 transform ${showToast ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95 pointer-events-none"}`}>
-        <span className="w-2 h-2 bg-black rounded-full animate-ping" />
-        {toastMessage}
-      </div>
-
-      {/* TOP DEEP GLOW NAVIGATION ACCENT */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
-
-      {/* RENDER HEAD HEADER */}
-      <header className="border-b border-zinc-900 bg-neutral-900/60 backdrop-blur-xl sticky top-0 z-40 shadow-xl">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-5">
-          
-          {/* Logo Assembly */}
-          <div className="flex items-center gap-3.5 group">
-            <div className="p-3 bg-gradient-to-br from-zinc-800 to-zinc-900 text-amber-400 rounded-xl border border-zinc-700 shadow-inner group-hover:border-amber-400/40 transition-all duration-500 transform group-hover:rotate-[10deg]">
-              <DashboardIcon />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-zinc-100 via-amber-300 to-yellow-500 bg-clip-text text-transparent">
-                VELOCITY
-              </h1>
-              <p className="text-[10px] uppercase tracking-widest text-zinc-400 font-bold">Elite Driving Intelligence</p>
-            </div>
+          <div className="text-center py-16" style={{ color: "var(--text-muted)" }}>
+            No student selected. Create a profile above.
           </div>
-
-          {/* Secure Interactive Switch Toggle Panels */}
-          {!isSharedStudent && (
-            <div className="bg-black/80 p-1.5 rounded-xl border border-zinc-800 shadow-2xl flex items-center gap-1.5">
-              <button
-                onClick={() => handleViewChange("instructor")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
-                  viewMode === "instructor" 
-                    ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black shadow-[0_4px_15px_rgba(245,158,11,0.25)] font-black" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50"
-                }`}
-              >
-                <KeyIcon /> {isUnlocked ? "Cockpit Active" : "Secure Login"}
-              </button>
-              <button
-                onClick={() => handleViewChange("pupil")}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
-                  viewMode === "pupil" 
-                    ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black shadow-[0_4px_15px_rgba(245,158,11,0.25)] font-black" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50"
-                }`}
-              >
-                <UserIcon /> Pupil Display
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* AUTH SYSTEM SLIDE DIALOG CAPTURE GRID */}
-      {showPinPrompt && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all animate-fadeIn">
-          <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-800 p-8 rounded-2xl max-w-sm w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-5 transform transition-all scale-100">
-            <div className="text-center space-y-2">
-              <div className="w-14 h-14 bg-amber-500/5 text-amber-400 rounded-full flex items-center justify-center mx-auto border border-amber-500/20 mb-1 animate-pulse">
-                <LockIcon />
-              </div>
-              <h3 className="text-xl font-black text-zinc-100 tracking-tight">Identity Validation</h3>
-              <p className="text-xs text-zinc-400">Provide the encrypted 4-digit system master code.</p>
-            </div>
-            
-            <form onSubmit={handlePinSubmit} className="space-y-4">
-              <input
-                type="password"
-                maxLength={4}
-                autoFocus
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))}
-                placeholder="••••"
-                className="w-full text-center tracking-[1.5em] font-mono text-2xl bg-black border border-zinc-800 focus:border-amber-400 rounded-xl py-3.5 text-amber-400 focus:outline-none shadow-inner transition-all duration-300 focus:shadow-[0_0_15px_rgba(245,158,11,0.1)]"
-              />
-              {pinError && <p className="text-xs text-rose-500 text-center font-bold tracking-wide animate-shake">Access Denied. Pin Code Invalid.</p>}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <button type="button" onClick={() => { setShowPinPrompt(false); setPinInput(""); setPinError(false); }} className="bg-zinc-950 hover:bg-zinc-900 text-zinc-400 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border border-zinc-800 transition-all transform active:scale-95">Cancel</button>
-                <button type="submit" className="bg-gradient-to-b from-amber-400 to-yellow-500 text-black font-black py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-md transition-all transform active:scale-95">Verify</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* CORE WORKSPACE CONSOLE WRAPPER */}
-      <main className="max-w-6xl mx-auto px-6 py-10 transition-opacity duration-500 animate-fadeIn">
-        
-        {/* UPPER PANEL CONTROL CONSOLE FOR MANAGING DRIVING ROSTER */}
-        {viewMode === "instructor" && !isSharedStudent && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 border border-zinc-800/80 rounded-2xl p-6 mb-10 shadow-2xl backdrop-blur-sm transform transition-all duration-300 hover:border-zinc-700/50">
-            
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Select Live Student Dossier</label>
-              <select
-                value={activeId}
-                onChange={(e) => setActiveId(e.target.value)}
-                className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl p-3 text-xs font-bold focus:outline-none focus:border-amber-400 transition-all cursor-pointer shadow-inner"
-              >
-                {students.map((st) => (
-                  <option key={st.id} value={st.id}>{st.name} — [{st.location}]</option>
-                ))}
-              </select>
-            </div>
-
-            <form onSubmit={handleAddNewStudent} className="md:col-span-2 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-              <div className="sm:col-span-2 space-y-2">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Inscribe New Pupil Profile</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Full Legal Name"
-                  value={newStudentName}
-                  onChange={(e) => setNewStudentName(e.target.value)}
-                  className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-amber-400 transition-all placeholder-zinc-600 shadow-inner"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Transmission</label>
-                <select
-                  value={newStudentCar}
-                  onChange={(e) => setNewStudentCar(e.target.value)}
-                  className="w-full bg-black border border-zinc-800 text-zinc-200 rounded-xl p-3 text-xs font-bold focus:outline-none focus:border-amber-400"
-                >
-                  <option value="Manual">Manual Fleet</option>
-                  <option value="Automatic">Automatic Fleet</option>
-                </select>
-              </div>
-              <button type="submit" className="bg-zinc-800 hover:bg-amber-400 hover:text-black border border-zinc-700 text-zinc-200 font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 transform active:scale-95 shadow-md">
-                <PlusIcon /> Initialize
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* DRIVING STUDENT IDENTITY METRIC CARD */}
-        {currentStudent ? (
-          <div className="space-y-8">
-            
-            {/* MASTER PROFILE DISPLAY COCKPIT HEADER */}
-            <div className="bg-gradient-to-br from-zinc-900 via-neutral-950 to-black border border-zinc-800 rounded-3xl p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 group-hover:bg-amber-500/10 transition-all duration-700" />
-              
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-zinc-800 to-zinc-950 border border-zinc-700 rounded-2xl flex items-center justify-center text-3xl font-black text-amber-400 shadow-2xl transform transition-transform duration-500 group-hover:scale-105">
-                  {currentStudent.name.split(" ").map(n => n[0]).join("")}
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-3xl font-black tracking-tight text-white">{currentStudent.name}</h2>
-                    <span className="px-3 py-1 bg-zinc-800/80 text-zinc-300 text-[10px] font-black uppercase tracking-widest rounded-md border border-zinc-700 shadow-inner">
-                      {currentStudent.carType}
-                    </span>
-                    {isSharedStudent && (
-                      <span className="px-3 py-1 bg-amber-500/10 text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-md border border-amber-400/20 animate-pulse">
-                        Encrypted Data Live Link
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-400 font-medium tracking-wide flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" /> Operational Radius: {currentStudent.location}, UK
-                  </p>
-                </div>
-              </div>
-
-              {/* ACTION COMMAND CONTROLS HUD */}
-              <div className="flex flex-wrap items-center gap-4 relative z-10">
-                {viewMode === "instructor" && !isSharedStudent && (
-                  <button
-                    onClick={handleCopyShareLink}
-                    className="bg-black hover:bg-zinc-900 text-amber-400 border border-amber-400/30 font-black py-4 px-5 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl transition-all duration-300 transform active:scale-95 hover:border-amber-400"
-                  >
-                    <ShareIcon /> Dispatch Telemetry Link
-                  </button>
-                )}
-
-                <div className="flex items-center gap-4 bg-black/60 px-5 py-4 rounded-2xl border border-zinc-800/80 min-w-[220px] shadow-inner">
-                  <div className="relative w-14 h-14 flex items-center justify-center bg-zinc-900 rounded-full border-2 border-zinc-800 text-base font-black text-amber-400 shadow-xl overflow-hidden group-hover:border-amber-400/40 transition-colors duration-500">
-                    <div className="absolute inset-0 bg-amber-400/5 animate-pulse" />
-                    {progressPercentage}%
-                  </div>
-                  <div>
-                    <p className="text-[9px] uppercase font-black tracking-widest text-zinc-500 mb-0.5">Syllabus Quotient</p>
-                    <p className="text-xs text-zinc-200 font-bold tracking-wide">
-                      {progressPercentage === 100 ? "DVSA Test Standard Certified" : "Performance Calibration Path"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* LOWER CONTENT DIVISION ACCORDING TO USER PERMISSIONS */}
-            {viewMode === "instructor" && !isSharedStudent ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                {/* INSTRUCTOR INPUT GRID SCALE */}
-                <div className="lg:col-span-2 space-y-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400 flex items-center gap-2"> Spheroid Competency Matrices</h3>
-                    <button onClick={() => setViewMode("pupil")} className="text-[10px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1.5 bg-rose-500/5 px-2.5 py-1 rounded-md border border-rose-500/10">
-                      <LockIcon /> Lock Terminals
-                    </button>
-                  </div>
-
-                  {currentStudent.skills.map((skill) => (
-                    <div key={skill.id} className="bg-gradient-to-b from-zinc-900/40 to-black border border-zinc-800/80 rounded-2xl p-6 transition-all duration-300 transform hover:translate-x-1 hover:border-zinc-700 shadow-md">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
-                        <div className="space-y-0.5">
-                          <h4 className="font-extrabold text-white text-base tracking-tight">{skill.name}</h4>
-                          <p className="text-xs text-zinc-400 leading-relaxed max-w-xl">{skill.description}</p>
-                        </div>
-                        <div className="bg-black px-3 py-1.5 rounded-xl border border-zinc-800 text-center sm:text-right min-w-[130px] shadow-inner">
-                          <span className="text-[9px] block font-black text-zinc-500 uppercase tracking-widest">Calibration</span>
-                          <span className="text-xs font-black text-amber-400 uppercase tracking-wide">{competencyLabels[skill.score]}</span>
-                        </div>
-                      </div>
-
-                      {/* Animated Score Bar Matrix Buttons */}
-                      <div className="grid grid-cols-5 gap-2 bg-black p-1.5 rounded-xl border border-zinc-900 shadow-inner">
-                        {[1, 2, 3, 4, 5].map((level) => {
-                          const isCurrent = skill.score === level;
-                          return (
-                            <button
-                              key={level}
-                              type="button"
-                              onClick={() => handleScoreChange(skill.id, level)}
-                              className={`py-3 text-center text-xs font-black rounded-lg transition-all duration-300 transform active:scale-95 ${
-                                isCurrent 
-                                  ? "bg-gradient-to-b from-amber-400 to-yellow-500 text-black font-black scale-[1.02] shadow-[0_4px_12px_rgba(245,158,11,0.2)]" 
-                                  : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900"
-                              }`}
-                            >
-                              {level}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* LESSON SUMMARY TEXT DEBRIEF COLUMN ENTRY */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-b from-zinc-900 via-zinc-950 to-black border border-zinc-800 rounded-3xl p-6 shadow-2xl space-y-6 sticky top-28 transition-all duration-300 hover:border-zinc-700/60">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-zinc-200 border-b border-zinc-800 pb-3">Session Log Debrief</h3>
-                    
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block">Performance Analysis Statements</label>
-                      <textarea
-                        rows={5}
-                        value={currentStudent.lessonNotes}
-                        onChange={(e) => handleTextChange("lessonNotes", e.target.value)}
-                        className="w-full bg-black border border-zinc-800 focus:border-amber-400 rounded-xl p-4 text-xs font-semibold leading-relaxed text-zinc-200 placeholder-zinc-700 focus:outline-none transition-all resize-none shadow-inner focus:shadow-[0_0_15px_rgba(245,158,11,0.05)]"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block">Next Target Benchmark Objectives</label>
-                      <input
-                        type="text"
-                        value={currentStudent.nextGoals}
-                        onChange={(e) => handleTextChange("nextGoals", e.target.value)}
-                        className="w-full bg-black border border-zinc-800 focus:border-amber-400 rounded-xl px-4 py-3.5 text-xs font-bold text-zinc-200 focus:outline-none transition-all shadow-inner"
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleSaveAll}
-                      className="w-full bg-gradient-to-b from-zinc-800 to-zinc-900 hover:from-amber-400 hover:to-yellow-500 hover:text-black border border-zinc-700 hover:border-transparent text-zinc-200 font-black py-4 rounded-xl shadow-xl text-xs uppercase tracking-widest transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2"
-                    >
-                      <SaveIcon /> Commit Cache Matrix
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* CLEAN LUXURY PUPIL SMARTPHONE PORTAL HOUSING */
-              <div className="space-y-8 max-w-4xl mx-auto transition-all animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-zinc-900/50 to-black border border-zinc-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-zinc-700 transition-all">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400" />
-                    <span className="text-[9px] uppercase font-black tracking-widest text-amber-400 block mb-2">Master Flight Instructor Assessment</span>
-                    <p className="text-xs leading-relaxed text-zinc-300 font-medium italic">&quot;{currentStudent.lessonNotes}&quot;</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-zinc-900/50 to-black border border-zinc-800/80 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-zinc-700 transition-all">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-yellow-500" />
-                    <span className="text-[9px] uppercase font-black tracking-widest text-yellow-500 block mb-2">Target Milestones For Next Deployment</span>
-                    <p className="text-xs font-black text-zinc-100 tracking-wide leading-relaxed">{currentStudent.nextGoals}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-zinc-400 tracking-wider mb-2">Syllabus Completion Index</h3>
-                  {currentStudent.skills.map((skill) => {
-                    const barPercent = (skill.score / 5) * 100;
-                    const isPerfect = skill.score === 5;
-                    return (
-                      <div key={skill.id} className="bg-gradient-to-b from-zinc-900/30 to-black border border-zinc-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md group hover:border-zinc-700/80 transition-all duration-300">
-                        <div className="space-y-1">
-                          <h4 className="font-extrabold text-white text-base tracking-tight">{skill.name}</h4>
-                          <p className="text-xs text-zinc-400 leading-relaxed max-w-lg">{skill.description}</p>
-                        </div>
-                        <div className="w-full sm:w-auto flex items-center gap-5 min-w-[280px]">
-                          <div className="flex-1 bg-black h-2 rounded-full border border-zinc-900 overflow-hidden p-[1px] shadow-inner">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                                isPerfect ? "bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "bg-zinc-700"
-                              }`} 
-                              style={{ width: `${barPercent}%` }} 
-                            />
-                          </div>
-                          <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border shrink-0 min-w-[115px] text-center shadow-sm transition-all duration-300 ${
-                            isPerfect 
-                              ? "bg-amber-400/10 text-amber-400 border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.05)]" 
-                              : "bg-zinc-900 text-zinc-500 border-zinc-800"
-                          }`}>
-                            {competencyLabels[skill.score]}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-16 bg-neutral-900/30 rounded-2xl border border-zinc-800 text-zinc-500 text-xs uppercase tracking-widest font-black">No Active Student Records Registered in System.</div>
         )}
       </main>
     </div>
